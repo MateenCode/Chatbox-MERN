@@ -4,9 +4,11 @@ const bodyParser = require("body-parser");
 const path = require("path");
 
 // Routes Requires
-// const name = require("./routes/api/");
+const message = require("./routes/api/message");
 
 const app = express();
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
 
 // Bodyparser Middleware
 app.use(bodyParser.json());
@@ -21,7 +23,7 @@ mongoose
   .catch(err => console.log(err));
 
 // Use Routes
-// app.use("/api/", );
+app.use("/api/", message);
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === "production") {
@@ -35,4 +37,9 @@ if (process.env.NODE_ENV === "production") {
 
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => console.log(`Server started on port ${port}`));
+// Socket connection
+io.on("connection", () => {
+  console.log("a user is connected");
+});
+
+http.listen(port, () => console.log(`Server started on port ${port}`));
