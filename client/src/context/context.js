@@ -7,10 +7,19 @@ const reducer = (state, action) => {};
 
 export class Provider extends Component {
   state = {
+    messages: [],
     dispatch: action => {
       this.setState(state => reducer(state, action));
     }
   };
+
+  componentDidMount() {
+    axios.get("/api/messages").then(res => {
+      this.setState({
+        messages: res.data
+      });
+    });
+  }
 
   render() {
     return (

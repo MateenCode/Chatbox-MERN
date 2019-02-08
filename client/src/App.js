@@ -1,13 +1,15 @@
 import React, { Component } from "react";
+import { Provider } from "./context/context";
 import "./css/App.css";
-import ChatContainer from "./components/ChatContainer";
+
+import Main from "./components/Main";
 
 class App extends Component {
   render() {
     return (
-      <React.Fragment>
-        <ChatContainer />
-      </React.Fragment>
+      <Provider>
+        <Main />
+      </Provider>
     );
   }
 }
