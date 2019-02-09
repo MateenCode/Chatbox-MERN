@@ -38,10 +38,13 @@ app.use("/api/", message);
 // @desc    post new message
 // @access  Public
 app.post("/api/message", (req, res) => {
-  let message = new Message(req.body);
+  let message = new Message({
+    username: req.body.username,
+    message: req.body.message
+  });
   message.save(err => {
     if (err) sendStatus(500);
-    io.emit("message", req.body);
+    io.emit("message", req.body.username, req.body.message);
     res.sendStatus(200);
   });
 });

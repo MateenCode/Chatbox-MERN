@@ -3,6 +3,9 @@ const Schema = mongoose.Schema;
 
 // Create Schema
 const MessageSchema = new Schema({
+  username: {
+    type: String
+  },
   message: {
     type: String,
     required: true
