@@ -1,15 +1,23 @@
 import React, { Component } from "react";
-import { Provider } from "./context/context";
+import { Container } from "reactstrap";
 import "./css/App.css";
 
-import Main from "./components/Main";
+import Header from "./component/Header";
+import Name from "./component/Name";
+import Chat from "./component/Chat";
+import Message from "./component/Message";
 
 class App extends Component {
   render() {
     return (
-      <Provider>
-        <Main />
-      </Provider>
+      <Container fluid>
+        <Header />
+        <Name />
+        <br />
+        <Chat />
+        <br />
+        <Message />
+      </Container>
     );
   }
 }
