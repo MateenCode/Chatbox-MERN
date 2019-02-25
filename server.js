@@ -1,6 +1,8 @@
 const mongo = require("mongodb").MongoClient;
-const port = process.env.PORT || 4000;
-const client = require("socket.io").listen(port).sockets;
+const express = require("express");
+const app = express();
+const path = require("path");
+const client = require("socket.io").listen(4000).sockets;
 
 // Connect to mongo
 mongo.connect(
@@ -69,3 +71,10 @@ mongo.connect(
     });
   }
 );
+
+app.get("/", function(req, res) {
+  res.sendFile(path.join(__dirname + "/client/index.html"));
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Server started on port ${port}`));
