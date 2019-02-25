@@ -1,61 +1,70 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const path = require("path");
-const http = require("http");
-const socket = require("socket.io");
+const mongo = require("mongodb").MongoClient;
+const client = require("socket.io").listen(4000).sockets;
 
-// Routes Requires
-const message = require("./routes/api/message");
+// Connect to mongo
+mongo.connect(
+  "mongodb://mateen:kazia12@ds225375.mlab.com:25375/chatbox",
+  function(err, db) {
+    if (err) {
+      throw err;
+    }
 
-const app = express();
-const server = http.createServer(app);
+    console.log("MongoDB connected...");
 
-// Bodyparser Middleware
-app.use(bodyParser.json());
+    // Connect to Socket.io
+    client.on("connection", function(socket) {
+      let chat = db.collection("chats");
 
-// DB Config
-const db = require("./config/keys").mongoURI;
+      // Create function to send status
+      sendStatus = function(s) {
+        socket.emit("status", s);
+      };
 
-// Connect to Mongo
-mongoose
-  .connect(db, { useNewUrlParser: true }) // Adding new mongo url parser
-  .then(() => console.log("MongoDB Connected..."))
-  .catch(err => console.log(err));
+      // Get chats from mongo collection
+      chat
+        .find()
+        .limit(100)
+        .sort({ _id: 1 })
+        .toArray(function(err, res) {
+          if (err) {
+            throw err;
+          }
 
-//Socket Connection
-const io = socket(server);
+          // Emit the messages
+          socket.emit("output", res);
+        });
 
-// create a connection
-io.on("connection", () => {
-  console.log("User connected");
-});
+      // Handle input events
+      socket.on("input", function(data) {
+        let name = data.name;
+        let message = data.message;
 
-// Use Routes
-app.use("/api/", message);
+        // Check for name and message
+        if (name == "" || message == "") {
+          // Send error status
+          sendStatus("Please enter a name and message");
+        } else {
+          // Insert message
+          chat.insert({ name: name, message: message }, function() {
+            client.emit("output", [data]);
 
-// @route   Post api/message
-// @desc    post new message
-// @access  Public
-app.post("/api/message", (req, res) => {
-  let message = new Message({
-    username: req.body.username,
-    message: req.body.message
-  });
-  message.save(err => {
-    if (err) sendStatus(500);
-    io.emit("message", req.body.username, req.body.message);
-    res.sendStatus(200);
-  });
-});
+            // Send status object
+            sendStatus({
+              message: "Message sent",
+              clear: true
+            });
+          });
+        }
+      });
 
-// Serve static assets if in production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static("client/build"));
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-  });
-}
-//Server Connection
-const port = process.env.PORT || 5000;
-server.listen(port, () => console.log(`Server started on port ${port}`));
+      // Handle clear
+      socket.on("clear", function(data) {
+        // Remove all chats from collection
+        chat.remove({}, function() {
+          // Emit cleared
+          socket.emit("cleared");
+        });
+      });
+    });
+  }
+);

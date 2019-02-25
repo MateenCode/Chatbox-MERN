@@ -1,24 +1,19 @@
-# Mongo Express React Node Starter Pack
+# MongoChat
 
-> Create full stack apps with Mongo Express React & Node . Run your client and server with a single command.
+Simple chat app that uses MongoDB and Socket.io
 
-## Quick Start
+### Version
+1.0.0
 
+## Install Dependencies
 ```bash
-# Install dependencies for server
-npm install
-
-# Install dependencies for client
-npm run client-install
-
-# Run the client & server with concurrently
-npm run dev
-
-# Run the Express server only
-npm run server
-
-# Run the React client only
-npm run client
-
-# Server runs on http://localhost:5000 and client on http://localhost:3000
+npm install 
 ```
+
+## Run Server
+```bash
+npm start
+```
+
+## Run App
+Open index.html
