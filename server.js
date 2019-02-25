@@ -1,5 +1,6 @@
 const mongo = require("mongodb").MongoClient;
-const client = require("socket.io").listen(4000).sockets;
+const port = process.env.PORT || 4000;
+const client = require("socket.io").listen(port).sockets;
 
 // Connect to mongo
 mongo.connect(
