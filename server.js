@@ -1,8 +1,17 @@
-const mongo = require("mongodb").MongoClient;
 const express = require("express");
-const app = express();
+const mongo = require("mongodb").MongoClient;
+const bodyParser = require("body-parser");
 const path = require("path");
-const client = require("socket.io").listen(4000).sockets;
+const app = express();
+
+const client = require("socket.io").listen(process.env.PORT || 4000).sockets;
+
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => console.log(`Server started on port ${port}`));
+
+// Bodyparser Middleware
+app.use(bodyParser.json());
 
 // Connect to mongo
 mongo.connect(
@@ -75,6 +84,3 @@ mongo.connect(
 app.get("/", function(req, res) {
   res.sendFile(path.join(__dirname + "/client/index.html"));
 });
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Server started on port ${port}`));

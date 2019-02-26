@@ -12,6 +12,7 @@
     "connect": "^3.6.6",
     "express": "^4.16.4",
     "mongodb": "^2.2.30",
+    "nodemon": "^1.18.10",
     "serve-static": "^1.13.2",
     "socket.io": "^2.0.3"
   }
