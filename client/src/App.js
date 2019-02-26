@@ -46,18 +46,28 @@ class App extends Component {
       });
   };
 
+  handleClear = () => {
+    this.setState({
+      messages: []
+    });
+    axios.delete("/clear");
+  };
   render() {
     return (
       <div className="container">
         <div className="row">
           <div className="col-md-6 offset-md-3 col-sm-12">
+            <h1 className="text-center">
+              ChatBox
+              <button
+                id="clear"
+                onClick={this.handleClear}
+                className="btn btn-danger ml-2"
+              >
+                Clear
+              </button>
+            </h1>
             <form onSubmit={this.handleSubmit}>
-              <h1 className="text-center">
-                ChatBox
-                <button id="clear" className="btn btn-danger ml-2">
-                  Clear
-                </button>
-              </h1>
               <div id="chat">
                 <input
                   type="text"

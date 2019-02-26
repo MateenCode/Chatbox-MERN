@@ -39,6 +39,12 @@ app.post("/messages", async (req, res) => {
   }
 });
 
+app.delete("/clear", (req, res) => {
+  Message.deleteMany()
+    .then(() => io.emit("cleared"))
+    .catch(err => console.log(err));
+});
+
 io.on("connection", () => {
   console.log("a user is connected");
 });
