@@ -10,7 +10,7 @@ class App extends Component {
   };
 
   componentDidMount = () => {
-    axios.get("http://localhost:3000/messages").then(res => {
+    axios.get("/messages").then(res => {
       this.setState({
         messages: res.data
       });
@@ -30,7 +30,7 @@ class App extends Component {
       message: this.state.message
     };
     this.setState({
-      messages: [newMessage, ...this.state.messages]
+      messages: [...this.state.messages, newMessage]
     });
 
     axios

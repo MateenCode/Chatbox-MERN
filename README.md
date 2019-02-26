@@ -1,24 +1,9 @@
-# Mongo Express React Node Starter Pack
+# ChatBox
 
-> Create full stack apps with Mongo Express React & Node . Run your client and server with a single command.
+A chat room application that instantly display data with the help of socket.io !
 
-## Quick Start
+# ScreenShot
 
-```bash
-# Install dependencies for server
-npm install
+<img width="672" alt="screen shot 2019-02-25 at 10 56 51 am" src="https://user-images.githubusercontent.com/28902787/53361110-207cd500-38ec-11e9-80f1-d3e40e2040f4.png">
 
-# Install dependencies for client
-npm run client-install
-
-# Run the client & server with concurrently
-npm run dev
-
-# Run the Express server only
-npm run server
-
-# Run the React client only
-npm run client
-
-# Server runs on http://localhost:5000 and client on http://localhost:3000
-```
+**[View Live](http://.surge.sh/)**
