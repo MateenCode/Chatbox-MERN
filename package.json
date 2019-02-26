@@ -1,19 +1,29 @@
 {
-  "name": "mongochat",
+  "name": "Chatbox ",
   "version": "1.0.0",
-  "description": "Simple chat app using sockets",
+  "description": "Simple chat app using React and socket",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "client-install": "cd client && npm install",
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Mateen kazia",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.14.6"
+  },
   "dependencies": {
-    "connect": "^3.6.6",
-    "express": "^4.16.4",
-    "mongodb": "^2.2.30",
-    "nodemon": "^1.18.10",
-    "serve-static": "^1.13.2",
-    "socket.io": "^2.0.3"
+    "body-parser": "^1.18.3",
+    "bootstrap": "^4.3.1",
+    "client": "file:client",
+    "concurrently": "^3.5.1",
+    "express": "^4.16.2",
+    "mongoose": "^5.4.4",
+    "path": "^0.12.7",
+    "socket.io": "^2.2.0"
   }
 }

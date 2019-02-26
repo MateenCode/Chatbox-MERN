@@ -1,86 +1,65 @@
 const express = require("express");
-const mongo = require("mongodb").MongoClient;
 const bodyParser = require("body-parser");
-const path = require("path");
 const app = express();
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
+const mongoose = require("mongoose");
 
-const client = require("socket.io").listen(process.env.PORT || 4000).sockets;
+app.use(express.static(__dirname));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
-const port = process.env.PORT || 3000;
+let Message = mongoose.model("Message", {
+  username: String,
+  message: String
+});
+
+app.get("/messages", (req, res) => {
+  Message.find({}, (err, messages) => {
+    res.send(messages);
+  });
+});
+
+app.post("/messages", async (req, res) => {
+  try {
+    let message = new Message(req.body);
+
+    let savedMessage = await message.save();
+    console.log("saved");
+
+    let censored = await Message.findOne({ message: "badword" });
+    if (censored) await Message.remove({ _id: censored.id });
+    else io.emit("message", req.body);
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
+    return console.log("error", error);
+  } finally {
+    console.log("Message Posted");
+  }
+});
+
+io.on("connection", () => {
+  console.log("a user is connected");
+});
+
+const db = "mongodb://mateen:kazia12@ds225375.mlab.com:25375/chatbox";
+
+mongoose
+  .connect(db, { useNewUrlParser: true })
+  .then(() => console.log("MongoDB Connected..."))
+  .catch(err => console.log(err));
+
+// Serve static assets if in production
+if (process.env.NODE_ENV === "production") {
+  // Set static folder
+  app.use(express.static("client/build"));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
+
+const port = process.env.PORT || 5000;
 
 app.listen(port, () => console.log(`Server started on port ${port}`));
-
-// Bodyparser Middleware
-app.use(bodyParser.json());
-
-// Connect to mongo
-mongo.connect(
-  "mongodb://mateen:kazia12@ds225375.mlab.com:25375/chatbox",
-  function(err, db) {
-    if (err) {
-      throw err;
-    }
-
-    console.log("MongoDB connected...");
-
-    // Connect to Socket.io
-    client.on("connection", function(socket) {
-      let chat = db.collection("chats");
-
-      // Create function to send status
-      sendStatus = function(s) {
-        socket.emit("status", s);
-      };
-
-      // Get chats from mongo collection
-      chat
-        .find()
-        .limit(100)
-        .sort({ _id: 1 })
-        .toArray(function(err, res) {
-          if (err) {
-            throw err;
-          }
-
-          // Emit the messages
-          socket.emit("output", res);
-        });
-
-      // Handle input events
-      socket.on("input", function(data) {
-        let name = data.name;
-        let message = data.message;
-
-        // Check for name and message
-        if (name == "" || message == "") {
-          // Send error status
-          sendStatus("Please enter a name and message");
-        } else {
-          // Insert message
-          chat.insert({ name: name, message: message }, function() {
-            client.emit("output", [data]);
-
-            // Send status object
-            sendStatus({
-              message: "Message sent",
-              clear: true
-            });
-          });
-        }
-      });
-
-      // Handle clear
-      socket.on("clear", function(data) {
-        // Remove all chats from collection
-        chat.remove({}, function() {
-          // Emit cleared
-          socket.emit("cleared");
-        });
-      });
-    });
-  }
-);
-
-app.get("/", function(req, res) {
-  res.sendFile(path.join(__dirname + "/client/index.html"));
-});
